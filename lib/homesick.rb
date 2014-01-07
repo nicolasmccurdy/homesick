@@ -4,10 +4,12 @@ require 'thor'
 class Homesick < Thor
   autoload :Shell, 'homesick/shell'
   autoload :Actions, 'homesick/actions'
+  autoload :SmartActions, 'homesick/smart_actions'
   autoload :Version, 'homesick/version'
 
   include Thor::Actions
   include Homesick::Actions
+  include Homesick::SmartActions
   include Homesick::Version
 
   add_runtime_options!
@@ -164,7 +166,7 @@ class Homesick < Thor
         target.delete
         mv absolute_path, castle_path
       else
-        shell.say_status(:track, "#{target} already exists, and is more recent than #{file}. Run 'homesick SYMLINK CASTLE' to create symlinks.", :blue) unless options[:quiet]
+        smart_say_status(:track, "#{target} already exists, and is more recent than #{file}. Run 'homesick SYMLINK CASTLE' to create symlinks.", :blue)
       end
     else
       mv absolute_path, castle_path

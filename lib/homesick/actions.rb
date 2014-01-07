@@ -10,10 +10,10 @@ class Homesick
       FileUtils.mkdir_p destination.dirname
 
       if ! destination.directory?
-        say_status 'git clone', "#{repo} to #{destination.expand_path}", :green unless options[:quiet]
+        smart_say_status 'git clone', "#{repo} to #{destination.expand_path}", :green
         system "git clone -q --config push.default=upstream --recursive #{repo} #{destination}" unless options[:pretend]
       else
-        say_status :exist, destination.expand_path, :blue unless options[:quiet]
+        smart_say_status :exist, destination.expand_path, :blue
       end
     end
 
@@ -22,10 +22,10 @@ class Homesick
 
       inside path do
         if !path.join('.git').exist?
-          say_status 'git init', '' unless options[:quiet]
+          smart_say_status 'git init', ''
           system 'git init >/dev/null' unless options[:pretend]
         else
-          say_status 'git init', 'already initialized', :blue unless options[:quiet]
+          smart_say_status 'git init', 'already initialized', :blue
         end
       end
     end
@@ -35,35 +35,35 @@ class Homesick
       existing_remote = nil if existing_remote == ''
 
       if !existing_remote
-        say_status 'git remote', "add #{name} #{url}" unless options[:quiet]
+        smart_say_status 'git remote', "add #{name} #{url}"
         system "git remote add #{name} #{url}" unless options[:pretend]
       else
-        say_status 'git remote', "#{name} already exists", :blue unless options[:quiet]
+        smart_say_status 'git remote', "#{name} already exists", :blue
       end
     end
 
     def git_submodule_init(config = {})
-      say_status 'git submodule', 'init', :green unless options[:quiet]
+      smart_say_status 'git submodule', 'init', :green
       system 'git submodule --quiet init' unless options[:pretend]
     end
 
     def git_submodule_update(config = {})
-      say_status 'git submodule', 'update', :green unless options[:quiet]
+      smart_say_status 'git submodule', 'update', :green
       system 'git submodule --quiet update --init --recursive >/dev/null 2>&1' unless options[:pretend]
     end
 
     def git_pull(config = {})
-      say_status 'git pull', '', :green unless options[:quiet]
+      smart_say_status 'git pull', '', :green
       system 'git pull --quiet' unless options[:pretend]
     end
 
     def git_push(config = {})
-      say_status 'git push', '', :green unless options[:quiet]
+      smart_say_status 'git push', '', :green
       system 'git push' unless options[:pretend]
     end
 
     def git_commit_all(config = {})
-      say_status 'git commit all', '', :green unless options[:quiet]
+      smart_say_status 'git commit all', '', :green
       if config[:message]
         system "git commit -a -m '#{config[:message]}'" unless options[:pretend]
       else
@@ -72,17 +72,17 @@ class Homesick
     end
 
     def git_add(file, config = {})
-      say_status 'git add file', '', :green unless options[:quiet]
+      smart_say_status 'git add file', '', :green
       system "git add '#{file}'" unless options[:pretend]
     end
 
     def git_status(config = {})
-      say_status 'git status', '', :green unless options[:quiet]
+      smart_say_status 'git status', '', :green
       system "git status" unless options[:pretend]
     end
 
     def git_diff(config = {})
-      say_status 'git diff', '', :green unless options[:quiet]
+      smart_say_status 'git diff', '', :green
       system "git diff" unless options[:pretend]
     end
 
@@ -91,7 +91,7 @@ class Homesick
       destination = Pathname.new(destination + source.basename)
 
       if destination.exist?
-        say_status :conflict, "#{destination} exists", :red unless options[:quiet]
+        smart_say_status :conflict, "#{destination} exists", :red
 
         if options[:force] || shell.file_collision(destination) { source }
           system "mv '#{source}' '#{destination}'" unless options[:pretend]
@@ -106,20 +106,20 @@ class Homesick
       target = Pathname.new(target)
 
       if target.symlink?
-        say_status :unlink, "#{target.expand_path}", :green unless options[:quiet]
+        smart_say_status :unlink, "#{target.expand_path}", :green
         FileUtils.rm_rf target
       else
-        say_status :conflict, "#{target} is not a symlink", :red unless options[:quiet]
+        smart_say_status :conflict, "#{target} is not a symlink", :red
       end
     end
 
     def rm(file)
-      say_status "rm #{file}", '', :green unless options[:quiet]
+      smart_say_status "rm #{file}", '', :green
       system "rm #{file}" if File.exists?(file)
     end
 
     def rm_rf(dir)
-      say_status "rm -rf #{dir}", '', :green unless options[:quiet]
+      smart_say_status "rm -rf #{dir}", '', :green
       system "rm -rf #{dir}"
     end
 
@@ -127,20 +127,20 @@ class Homesick
       target = Pathname.new(target)
 
       if target.symlink?
-        say_status :unlink, "#{target.expand_path}", :green unless options[:quiet]
+        smart_say_status :unlink, "#{target.expand_path}", :green
         FileUtils.rm_rf target
       else
-        say_status :conflict, "#{target} is not a symlink", :red unless options[:quiet]
+        smart_say_status :conflict, "#{target} is not a symlink", :red
       end
     end
 
     def rm(file)
-      say_status "rm #{file}", '', :green unless options[:quiet]
+      smart_say_status "rm #{file}", '', :green
       system "rm #{file}"
     end
 
     def rm_r(dir)
-      say_status "rm -r #{dir}", '', :green unless options[:quiet]
+      smart_say_status "rm -r #{dir}", '', :green
       system "rm -r #{dir}"
     end
 
@@ -151,23 +151,23 @@ class Homesick
 
       if destination.symlink?
         if destination.readlink == source
-          say_status :identical, destination.expand_path, :blue unless options[:quiet]
+          smart_say_status :identical, destination.expand_path, :blue
         else
-          say_status :conflict, "#{destination} exists and points to #{destination.readlink}", :red unless options[:quiet]
+          smart_say_status :conflict, "#{destination} exists and points to #{destination.readlink}", :red
 
           if options[:force] || shell.file_collision(destination) { source }
             system "ln -nsf '#{source}' '#{destination}'" unless options[:pretend]
           end
         end
       elsif destination.exist?
-        say_status :conflict, "#{destination} exists", :red unless options[:quiet]
+        smart_say_status :conflict, "#{destination} exists", :red
 
         if options[:force] || shell.file_collision(destination) { source }
           system "rm -rf '#{destination}'" unless options[:pretend]
           system "ln -sf '#{source}' '#{destination}'" unless options[:pretend]
         end
       else
-        say_status :symlink, "#{source.expand_path} to #{destination.expand_path}", :green unless options[:quiet]
+        smart_say_status :symlink, "#{source.expand_path} to #{destination.expand_path}", :green
         system "ln -s '#{source}' '#{destination}'" unless options[:pretend]
       end
     end
