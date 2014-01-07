@@ -11,7 +11,7 @@ class Homesick
 
       if ! destination.directory?
         smart_say_status 'git clone', "#{repo} to #{destination.expand_path}", :green
-        system "git clone -q --config push.default=upstream --recursive #{repo} #{destination}" unless options[:pretend]
+        smart_system "git clone -q --config push.default=upstream --recursive #{repo} #{destination}"
       else
         smart_say_status :exist, destination.expand_path, :blue
       end
@@ -23,7 +23,7 @@ class Homesick
       inside path do
         if !path.join('.git').exist?
           smart_say_status 'git init', ''
-          system 'git init >/dev/null' unless options[:pretend]
+          smart_system 'git init >/dev/null'
         else
           smart_say_status 'git init', 'already initialized', :blue
         end
@@ -36,7 +36,7 @@ class Homesick
 
       if !existing_remote
         smart_say_status 'git remote', "add #{name} #{url}"
-        system "git remote add #{name} #{url}" unless options[:pretend]
+        smart_system "git remote add #{name} #{url}"
       else
         smart_say_status 'git remote', "#{name} already exists", :blue
       end
@@ -44,46 +44,46 @@ class Homesick
 
     def git_submodule_init(config = {})
       smart_say_status 'git submodule', 'init', :green
-      system 'git submodule --quiet init' unless options[:pretend]
+      smart_system 'git submodule --quiet init'
     end
 
     def git_submodule_update(config = {})
       smart_say_status 'git submodule', 'update', :green
-      system 'git submodule --quiet update --init --recursive >/dev/null 2>&1' unless options[:pretend]
+      smart_system 'git submodule --quiet update --init --recursive >/dev/null 2>&1'
     end
 
     def git_pull(config = {})
       smart_say_status 'git pull', '', :green
-      system 'git pull --quiet' unless options[:pretend]
+      smart_system 'git pull --quiet'
     end
 
     def git_push(config = {})
       smart_say_status 'git push', '', :green
-      system 'git push' unless options[:pretend]
+      smart_system 'git push'
     end
 
     def git_commit_all(config = {})
       smart_say_status 'git commit all', '', :green
       if config[:message]
-        system "git commit -a -m '#{config[:message]}'" unless options[:pretend]
+        smart_system "git commit -a -m '#{config[:message]}'"
       else
-        system 'git commit -v -a' unless options[:pretend]
+        smart_system 'git commit -v -a'
       end
     end
 
     def git_add(file, config = {})
       smart_say_status 'git add file', '', :green
-      system "git add '#{file}'" unless options[:pretend]
+      smart_system "git add '#{file}'"
     end
 
     def git_status(config = {})
       smart_say_status 'git status', '', :green
-      system "git status" unless options[:pretend]
+      smart_system "git status"
     end
 
     def git_diff(config = {})
       smart_say_status 'git diff', '', :green
-      system "git diff" unless options[:pretend]
+      smart_system "git diff"
     end
 
     def mv(source, destination, config = {})
@@ -98,7 +98,7 @@ class Homesick
         end
       else
         # this needs some sort of message here.
-        system "mv '#{source}' '#{destination}'" unless options[:pretend]
+        smart_system "mv '#{source}' '#{destination}'"
       end
     end
 
@@ -163,12 +163,12 @@ class Homesick
         smart_say_status :conflict, "#{destination} exists", :red
 
         if options[:force] || shell.file_collision(destination) { source }
-          system "rm -rf '#{destination}'" unless options[:pretend]
-          system "ln -sf '#{source}' '#{destination}'" unless options[:pretend]
+          smart_system "rm -rf '#{destination}'"
+          smart_system "ln -sf '#{source}' '#{destination}'"
         end
       else
         smart_say_status :symlink, "#{source.expand_path} to #{destination.expand_path}", :green
-        system "ln -s '#{source}' '#{destination}'" unless options[:pretend]
+        smart_system "ln -s '#{source}' '#{destination}'"
       end
     end
   end

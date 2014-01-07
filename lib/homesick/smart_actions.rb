@@ -7,5 +7,11 @@ class Homesick
     def smart_say_status(*args)
       say_status(*args) unless options[:quiet]
     end
+
+    # Similar to system in Kernel, but does nothing if the pretend option is
+    # enabled.
+    def smart_system(*args)
+      system(*args) unless options[:pretend]
+    end
   end
 end
