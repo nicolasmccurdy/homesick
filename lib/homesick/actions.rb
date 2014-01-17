@@ -1,4 +1,6 @@
 # -*- encoding : utf-8 -*-
+require 'grit'
+
 class Homesick
   # Git-related and file-related helper methods for the Homesick class
   module Actions

@@ -16,6 +16,7 @@ group :development do
   gem "simplecov"
   gem "test_construct"
   gem "capture-output", "~> 1.0.0"
+  gem "grit"
   if RbConfig::CONFIG['host_os'] =~ /linux|freebsd|openbsd|sunos|solaris/
     gem 'libnotify'
   end
