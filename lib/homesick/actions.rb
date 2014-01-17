@@ -1,8 +1,15 @@
 # -*- encoding : utf-8 -*-
+require 'rugged'
+
 class Homesick
   # Git-related and file-related helper methods for the Homesick class
   module Actions
     # TODO: move this to be more like thor's template, empty_directory, etc
+
+    def rugged_repo(*args)
+      Rugged::Repository.new Rugged::Repository.discover(*args)
+    end
+
     def git_clone(repo, config = {})
       config ||= {}
       destination = config[:destination] || File.basename(repo, '.git')
@@ -28,7 +35,7 @@ class Homesick
           say_status 'git init', 'already initialized', :blue unless options[:quiet]
         else
           say_status 'git init', '' unless options[:quiet]
-          system 'git init >/dev/null' unless options[:pretend]
+          Rugged::Repository.init_at '.' unless options[:pretend]
         end
       end
     end
@@ -41,7 +48,7 @@ class Homesick
         say_status 'git remote', "#{name} already exists", :blue unless options[:quiet]
       else
         say_status 'git remote', "add #{name} #{url}" unless options[:quiet]
-        system "git remote add #{name} #{url}" unless options[:pretend]
+        Rugged::Remote.add rugged_repo, name, url unless options[:pretend]
       end
     end
 
