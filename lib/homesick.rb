@@ -5,6 +5,7 @@ require 'thor'
 class Homesick < Thor
   autoload :Shell, 'homesick/shell'
   autoload :Actions, 'homesick/actions'
+  autoload :RepoFinder, 'homesick/repo_finder'
   autoload :Version, 'homesick/version'
 
   include Thor::Actions
