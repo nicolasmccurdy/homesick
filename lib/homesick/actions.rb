@@ -5,6 +5,11 @@ class Homesick
   # Git-related and file-related helper methods for the Homesick class
   module Actions
     # TODO: move this to be more like thor's template, empty_directory, etc
+
+    def grit_repo(*args)
+      Homesick::RepoFinder.find_grit_repo(*args)
+    end
+
     def git_clone(repo, config = {})
       config ||= {}
       destination = config[:destination] || File.basename(repo, '.git')
@@ -30,7 +35,7 @@ class Homesick
           say_status 'git init', 'already initialized', :blue unless options[:quiet]
         else
           say_status 'git init', '' unless options[:quiet]
-          system 'git init >/dev/null' unless options[:pretend]
+          Grit::Repo.init '.' unless options[:pretend]
         end
       end
     end
@@ -43,7 +48,7 @@ class Homesick
         say_status 'git remote', "#{name} already exists", :blue unless options[:quiet]
       else
         say_status 'git remote', "add #{name} #{url}" unless options[:quiet]
-        system "git remote add #{name} #{url}" unless options[:pretend]
+        grit_repo.remote_add name, url unless options[:pretend]
       end
     end
 
