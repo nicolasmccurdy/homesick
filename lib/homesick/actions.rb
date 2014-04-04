@@ -41,7 +41,7 @@ class Homesick
     end
 
     def git_remote_add(name, url)
-      existing_remote = `git config remote.#{name}.url`.chomp
+      existing_remote = rugged_repo.config["remote.#{name}.url"]
       existing_remote = nil if existing_remote == ''
 
       if existing_remote

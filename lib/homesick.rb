@@ -188,7 +188,7 @@ class Homesick < Thor
   def list
     inside_each_castle do |castle|
       say_status castle.relative_path_from(repos_dir).to_s,
-                 `git config remote.origin.url`.chomp,
+                 Rugged::Remote.lookup(rugged_repo, 'origin').url,
                  :cyan
     end
   end
@@ -219,7 +219,7 @@ class Homesick < Thor
   def generate(castle)
     castle = Pathname.new(castle).expand_path
 
-    github_user = `git config github.user`.chomp
+    github_user = Rugged::Config.global['github.user']
     github_user = nil if github_user == ''
     github_repo = castle.basename
 
