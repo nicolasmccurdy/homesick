@@ -26,10 +26,10 @@ RSpec.configure do |config|
     name = Pathname.new(path).basename
     castles.directory(path) do |castle|
       Dir.chdir(castle) do
-        system 'git init >/dev/null 2>&1'
-        system 'git config user.email "test@test.com"'
-        system 'git config user.name "Test Name"'
-        system "git remote add origin git://github.com/technicalpickles/#{name}.git >/dev/null 2>&1"
+        repo = Rugged::Repository.init_at '.'
+        repo.config['user.email'] = 'test@test.com'
+        repo.config['user.name'] = 'Test Name'
+        Rugged::Remote.add(repo, 'origin', "git://github.com/technicalpickles/#{name}.git")
         if subdirs
           subdir_file = castle.join(Homesick::SUBDIR_FILENAME)
           subdirs.each do |subdir|
