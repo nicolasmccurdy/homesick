@@ -75,6 +75,21 @@ class Homesick < Thor
     end
   end
 
+  desc 'pull CASTLE', 'Update the specified castle'
+  def pull(name = DEFAULT_CASTLE_NAME, *args)
+    git_exec name, 'pull', *args
+  end
+
+  desc 'commit CASTLE MESSAGE', "Commit the specified castle's changes"
+  def commit(name = DEFAULT_CASTLE_NAME, *args)
+    git_exec name, 'commit', *args
+  end
+
+  desc 'push CASTLE', 'Push the specified castle'
+  def push(name = DEFAULT_CASTLE_NAME, *args)
+    git_exec name, 'push', *args
+  end
+
   desc 'unlink CASTLE', 'Unsymlinks all dotfiles from the specified castle'
   def unlink(name = DEFAULT_CASTLE_NAME)
     check_castle_existance(name, 'symlink')
@@ -164,6 +179,16 @@ class Homesick < Thor
                  `git config remote.origin.url`.chomp,
                  :cyan
     end
+  end
+
+  desc 'status CASTLE', 'Shows the git status of a castle'
+  def status(castle = DEFAULT_CASTLE_NAME, *args)
+    git_exec castle, 'status', *args
+  end
+
+  desc 'diff CASTLE', 'Shows the git diff of uncommitted changes in a castle'
+  def diff(castle = DEFAULT_CASTLE_NAME, *args)
+    git_exec castle, 'diff', *args
   end
 
   desc 'show_path CASTLE', 'Prints the path of a castle'
@@ -443,6 +468,10 @@ class Homesick < Thor
         yield(absolute_path, home_path)
       end
     end
+  end
+
+  def git_exec(castle, *args)
+    exec castle, 'git', *args
   end
 
   def unsymlink_each(castle, basedir, subdirs)
