@@ -75,33 +75,6 @@ class Homesick < Thor
     end
   end
 
-  desc 'pull CASTLE', 'Update the specified castle'
-  method_option :all,
-                type: :boolean,
-                default: false,
-                required: false,
-                desc: 'Update all cloned castles'
-  def pull(name = DEFAULT_CASTLE_NAME)
-    if options[:all]
-      inside_each_castle do |castle|
-        shell.say castle.to_s.gsub(repos_dir.to_s + '/', '') + ':'
-        update_castle castle
-      end
-    else
-      update_castle name
-    end
-  end
-
-  desc 'commit CASTLE MESSAGE', "Commit the specified castle's changes"
-  def commit(name = DEFAULT_CASTLE_NAME, message = nil)
-    commit_castle name, message
-  end
-
-  desc 'push CASTLE', 'Push the specified castle'
-  def push(name = DEFAULT_CASTLE_NAME)
-    push_castle name
-  end
-
   desc 'unlink CASTLE', 'Unsymlinks all dotfiles from the specified castle'
   def unlink(name = DEFAULT_CASTLE_NAME)
     check_castle_existance(name, 'symlink')
@@ -190,22 +163,6 @@ class Homesick < Thor
       say_status castle.relative_path_from(repos_dir).to_s,
                  `git config remote.origin.url`.chomp,
                  :cyan
-    end
-  end
-
-  desc 'status CASTLE', 'Shows the git status of a castle'
-  def status(castle = DEFAULT_CASTLE_NAME)
-    check_castle_existance(castle, 'status')
-    inside repos_dir.join(castle) do
-      git_status
-    end
-  end
-
-  desc 'diff CASTLE', 'Shows the git diff of uncommitted changes in a castle'
-  def diff(castle = DEFAULT_CASTLE_NAME)
-    check_castle_existance(castle, 'diff')
-    inside repos_dir.join(castle) do
-      git_diff
     end
   end
 
@@ -379,29 +336,6 @@ class Homesick < Thor
       Dir.chdir castle do # so we can call git config from the right contxt
         yield castle
       end
-    end
-  end
-
-  def update_castle(castle)
-    check_castle_existance(castle, 'pull')
-    inside repos_dir.join(castle) do
-      git_pull
-      git_submodule_init
-      git_submodule_update
-    end
-  end
-
-  def commit_castle(castle, message)
-    check_castle_existance(castle, 'commit')
-    inside repos_dir.join(castle) do
-      git_commit_all message: message
-    end
-  end
-
-  def push_castle(castle)
-    check_castle_existance(castle, 'push')
-    inside repos_dir.join(castle) do
-      git_push
     end
   end
 

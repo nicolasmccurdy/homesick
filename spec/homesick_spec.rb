@@ -369,51 +369,6 @@ describe 'homesick' do
     end
   end
 
-  describe 'status' do
-    it 'says "nothing to commit" when there are no changes' do
-      given_castle('castle_repo')
-      text = Capture.stdout { homesick.status('castle_repo') }
-      expect(text).to match(/nothing to commit \(create\/copy files and use "git add" to track\)$/)
-    end
-
-    it 'says "Changes to be committed" when there are changes' do
-      given_castle('castle_repo')
-      some_rc_file = home.file '.some_rc_file'
-      homesick.track(some_rc_file.to_s, 'castle_repo')
-      text = Capture.stdout { homesick.status('castle_repo') }
-      expect(text).to match(
-        /Changes to be committed:.*new file:\s*home\/.some_rc_file/m
-      )
-    end
-  end
-
-  describe 'diff' do
-    it 'outputs an empty message when there are no changes to commit' do
-      given_castle('castle_repo')
-      some_rc_file = home.file '.some_rc_file'
-      homesick.track(some_rc_file.to_s, 'castle_repo')
-      Capture.stdout do
-        homesick.commit 'castle_repo', 'Adding a file to the test'
-      end
-      text = Capture.stdout { homesick.diff('castle_repo') }
-      expect(text).to eq('')
-    end
-
-    it 'outputs a diff message when there are changes to commit' do
-      given_castle('castle_repo')
-      some_rc_file = home.file '.some_rc_file'
-      homesick.track(some_rc_file.to_s, 'castle_repo')
-      Capture.stdout do
-        homesick.commit 'castle_repo', 'Adding a file to the test'
-      end
-      File.open(some_rc_file.to_s, 'w') do |file|
-        file.puts 'Some test text'
-      end
-      text = Capture.stdout { homesick.diff('castle_repo') }
-      expect(text).to match(/diff --git.+Some test text$/m)
-    end
-  end
-
   describe 'show_path' do
     it 'says the path of a castle' do
       castle = given_castle('castle_repo')
@@ -421,56 +376,6 @@ describe 'homesick' do
       expect(homesick).to receive(:say).with(castle.dirname)
 
       homesick.show_path('castle_repo')
-    end
-  end
-
-  describe 'pull' do
-    it 'performs a pull, submodule init and update when the given castle exists' do
-      given_castle('castle_repo')
-      allow(homesick).to receive(:system).once.with('git pull --quiet')
-      allow(homesick).to receive(:system).once.with('git submodule --quiet init')
-      allow(homesick).to receive(:system).once.with('git submodule --quiet update --init --recursive >/dev/null 2>&1')
-      homesick.pull 'castle_repo'
-    end
-
-    it 'prints an error message when trying to pull a non-existant castle' do
-      expect(homesick).to receive('say_status').once
-        .with(:error,
-              /Could not pull castle_repo, expected .* exist and contain dotfiles/,
-              :red)
-      expect { homesick.pull 'castle_repo' }.to raise_error(SystemExit)
-    end
-
-    describe '--all' do
-      it 'pulls each castle when invoked with --all' do
-        given_castle('castle_repo')
-        given_castle('glencairn')
-        allow(homesick).to receive(:system).exactly(2).times.with('git pull --quiet')
-        allow(homesick).to receive(:system).exactly(2).times
-          .with('git submodule --quiet init')
-        allow(homesick).to receive(:system).exactly(2).times
-          .with('git submodule --quiet update --init --recursive >/dev/null 2>&1')
-        Capture.stdout do
-          Capture.stderr { homesick.invoke 'pull', [], all: true }
-        end
-      end
-    end
-
-  end
-
-  describe 'push' do
-    it 'performs a git push on the given castle' do
-      given_castle('castle_repo')
-      allow(homesick).to receive(:system).once.with('git push')
-      homesick.push 'castle_repo'
-    end
-
-    it 'prints an error message when trying to push a non-existant castle' do
-      expect(homesick).to receive('say_status').once
-              .with(:error,
-                    /Could not push castle_repo, expected .* exist and contain dotfiles/,
-                    :red)
-      expect { homesick.push 'castle_repo' }.to raise_error(SystemExit)
     end
   end
 
@@ -535,18 +440,6 @@ describe 'homesick' do
         expect(tracked_file).to exist
 
         expect(some_rc_file.readlink).to eq(tracked_file)
-      end
-    end
-
-    describe 'commit' do
-      it 'has a commit message when the commit succeeds' do
-        given_castle('castle_repo')
-        some_rc_file = home.file '.a_random_rc_file'
-        homesick.track(some_rc_file.to_s, 'castle_repo')
-        text = Capture.stdout do
-          homesick.commit('castle_repo', 'Test message')
-        end
-        expect(text).to match(/^\[master \(root-commit\) \w+\] Test message/)
       end
     end
 
