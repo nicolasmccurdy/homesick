@@ -299,29 +299,19 @@ class Homesick < Thor
   # This section contains aliases for git commands. This is mostly here for back
   # compatibility.
 
-  desc 'pull CASTLE [ARGS]', 'Update the specified castle'
-  def pull(castle = DEFAULT_CASTLE_NAME, *args)
-    git_exec castle, 'pull', *args
-  end
+  git_commands = {
+    pull: 'Update the specified castle',
+    commit: "Commit the specified castle's changes",
+    push: 'Push the specified castle',
+    status: 'Shows the git status of a castle',
+    diff: 'Shows the git diff of uncommitted changes in a castle'
+  }
 
-  desc 'commit CASTLE [ARGS]', "Commit the specified castle's changes"
-  def commit(castle = DEFAULT_CASTLE_NAME, *args)
-    git_exec castle, 'commit', *args
-  end
-
-  desc 'push CASTLE [ARGS]', 'Push the specified castle'
-  def push(castle = DEFAULT_CASTLE_NAME, *args)
-    git_exec castle, 'push', *args
-  end
-
-  desc 'status CASTLE [ARGS]', 'Shows the git status of a castle'
-  def status(castle = DEFAULT_CASTLE_NAME, *args)
-    git_exec castle, 'status', *args
-  end
-
-  desc 'diff CASTLE [ARGS]', 'Shows the git diff of uncommitted changes in a castle'
-  def diff(castle = DEFAULT_CASTLE_NAME, *args)
-    git_exec castle, 'diff', *args
+  git_commands.each do |command, description|
+    desc "#{command} CASTLE [ARGS]", description
+    define_method(command) do |castle = DEFAULT_CASTLE_NAME, *args|
+      git_exec castle, command, *args
+    end
   end
 
   protected
