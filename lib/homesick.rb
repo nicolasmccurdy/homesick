@@ -299,27 +299,27 @@ class Homesick < Thor
   # This section contains aliases for git commands. This is mostly here for back
   # compatibility.
 
-  desc 'pull CASTLE', 'Update the specified castle'
-  def pull(name = DEFAULT_CASTLE_NAME, *args)
-    git_exec name, 'pull', *args
+  desc 'pull CASTLE [ARGS]', 'Update the specified castle'
+  def pull(castle = DEFAULT_CASTLE_NAME, *args)
+    git_exec castle, 'pull', *args
   end
 
-  desc 'commit CASTLE MESSAGE', "Commit the specified castle's changes"
-  def commit(name = DEFAULT_CASTLE_NAME, *args)
-    git_exec name, 'commit', *args
+  desc 'commit CASTLE [ARGS]', "Commit the specified castle's changes"
+  def commit(castle = DEFAULT_CASTLE_NAME, *args)
+    git_exec castle, 'commit', *args
   end
 
-  desc 'push CASTLE', 'Push the specified castle'
-  def push(name = DEFAULT_CASTLE_NAME, *args)
-    git_exec name, 'push', *args
+  desc 'push CASTLE [ARGS]', 'Push the specified castle'
+  def push(castle = DEFAULT_CASTLE_NAME, *args)
+    git_exec castle, 'push', *args
   end
 
-  desc 'status CASTLE', 'Shows the git status of a castle'
+  desc 'status CASTLE [ARGS]', 'Shows the git status of a castle'
   def status(castle = DEFAULT_CASTLE_NAME, *args)
     git_exec castle, 'status', *args
   end
 
-  desc 'diff CASTLE', 'Shows the git diff of uncommitted changes in a castle'
+  desc 'diff CASTLE [ARGS]', 'Shows the git diff of uncommitted changes in a castle'
   def diff(castle = DEFAULT_CASTLE_NAME, *args)
     git_exec castle, 'diff', *args
   end
